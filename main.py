@@ -1,29 +1,41 @@
+import sys
+from stats import (
+    get_num_words,
+    chars_dict_to_sorted_list,
+    get_chars_dict,
+)
+
+
 def main():
-    with open("books/frankenstein.txt") as f:
-        contents = f.read()
-        print("--- Begin report of books/frankenstein.txt ---")
-        print(f"{num_words(contents)} words found in the document\n")
-        characters = num_characters(contents)
-        sorted_characters_by_occurence = sorted(characters.items(), key=lambda x:x[1], reverse=True)
-        for c in sorted_characters_by_occurence:
-            if c[0].isalpha():
-                print(f"The '{c[0]}' character was found {c[1]} times")
-        print("--- End report ---")
+    if len(sys.argv) < 2:
+        print("Usage: python3 main.py <path_to_book>")
+        sys.exit(1)
+    book_path = sys.argv[1]
 
-def num_words(s : str) -> int:
-    return len(s.split())
+    text = get_book_text(book_path)
+    num_words = get_num_words(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
+    print_report(book_path, num_words, chars_sorted_list)
 
-def num_characters(text : str) -> {str, int}:
-    d = {}
-    for letter in text:
-        try:
-            d[letter.lower()] += 1
-        except KeyError:
-            d[letter.lower()] = []
-            d[letter.lower()] = 1
-    return d
 
-def dict_sorter(dict):
-    return dict.key
+def get_book_text(path):
+    with open(path) as f:
+        return f.read()
+
+
+def print_report(book_path, num_words, chars_sorted_list):
+    print("============ BOOKBOT ============")
+    print(f"Analyzing book found at {book_path}...")
+    print("----------- Word Count ----------")
+    print(f"Found {num_words} total words")
+    print("--------- Character Count -------")
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
+            continue
+        print(f"{item['char']}: {item['num']}")
+
+    print("============= END ===============")
+
 
 main()
